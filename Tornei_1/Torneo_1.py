@@ -1,6 +1,7 @@
 import os
 from openpyxl import Workbook, load_workbook
 from datetime import datetime
+import random
 
 # File path and sheet name
 FOLDER = "tournament_manager"
@@ -199,45 +200,130 @@ def update_statistics():
     wb.save(FILE_PATH)
     print("\n📁 Statistics sheet updated and saved.")
 
-# Main program
+def torneo_eliminazione(squadre):
+    turno = 1
+    while len(squadre) > 1:
+        print(f"\n--- Turno {turno} - {len(squadre)} squadre ---")
+        random.shuffle(squadre)
+        vincitori = []
+
+        for i in range(0, len(squadre), 2):
+            squadra1 = squadre[i]
+            squadra2 = squadre[i + 1]
+            print(f"{squadra1} vs {squadra2}")
+
+            while True:
+                vincitore = input("Inserisci il vincitore: ").strip().lower()
+                if vincitore != squadra1.lower() and vincitore != squadra2.lower():
+                    print("Errore: il vincitore deve essere una delle due squadre.")
+                else:
+                    break
+            vincitori.append(vincitore.capitalize())
+
+            while True:
+                risultato = input("Inserisci il risultato (es. 2-1): ").strip()
+                try:
+                    g1, g2 = map(int, risultato.split("-"))
+                except ValueError:
+                    print("Formato non valido. Usa il formato es. 2-1")
+                    continue
+
+                if g1 == g2:
+                    print("È un torneo a eliminazione diretta: non sono possibili i pareggi.")
+                else:
+                    break
+
+            print(f"Vince {vincitore.capitalize()} con il risultato di {g1}-{g2}")
+
+        squadre = vincitori
+        turno += 1
+
+    print(f"\n🏆 La squadra vincitrice del torneo è: {squadre[0]}")
+
+# === Avvio del programma ===
 if not os.path.exists(FILE_PATH):
-    print("🛠️ Creating new Excel file...")
-    add_players()
+    print("🛠️ Nessun file trovato. Creazione nuovo file Excel...")
+    
+    add_players()  # Richiede input per aggiungere giocatori
 
     wb = Workbook()
     ws = wb.active
     ws.title = SHEET_NAME
 
+    # Inserimento intestazione e giocatori nella prima colonna
     ws.append(["Players"])
     for player in player_list:
         ws.append([player])
 
     wb.save(FILE_PATH)
-    print(f"✅ File '{FILE}' created in folder '{FOLDER}' with registered players.")
+    print(f"✅ File '{FILE}' creato nella cartella '{FOLDER}' con i giocatori registrati.")
+
+    registered_players = player_list.copy()
+
 else:
-    print(f"File '{FILE}' already exists in folder '{FOLDER}'.")
-    print("Opening file...")
+    print(f"📂 Il file '{FILE}' esiste già nella cartella '{FOLDER}'.")
+    print("📥 Apertura file in corso...")
+
     try:
         wb = load_workbook(FILE_PATH)
         ws = wb[SHEET_NAME]
-        print("✅ File opened successfully.")
-        registered_players = [row[0] for row in ws.iter_rows(min_row=2, max_col=1, values_only=True) if row[0]]
-        if not registered_players:
-            print("❌ No players found in the file.")
-    except ValueError:
-        print(f"❌ Error opening file. Make sure it’s not open elsewhere: {ValueError}")
+        print("✅ File aperto con successo.")
 
-    while True:
-        action = input("What do you want to do? [1=Add players, 2=List players, 3=Register match, 4=Statistics, 0=Exit]: ").strip()
-        if action == "1":
-            add_new_players(registered_players)
-        elif action == "2":
-            read_players(registered_players)
-        elif action == "3":
-            register_match(registered_players)
-            wb = load_workbook(FILE_PATH)  # Reload updated file
-        elif action == "4":
-            update_statistics()
-        elif action == "0":
-            print("👋 Exiting program.")
-            break
+        registered_players = [
+            row[0] for row in ws.iter_rows(min_row=2, max_col=1, values_only=True) if row[0]
+        ]
+
+        if not registered_players:
+            print("⚠️ Nessun giocatore trovato nel file.")
+    except Exception as e:
+        print(f"❌ Errore durante l'apertura del file: {e}")
+        registered_players = []
+
+# === Ciclo principale ===
+while True:
+    num_players = len(registered_players)
+
+    if num_players % 2 == 0 and num_players > 0:
+        print(f"\n✅ È possibile giocare il torneo: ci sono {num_players} giocatori.")
+        print("Opzioni disponibili:")
+        print("[1=Aggiungi giocatori, 2=Lista giocatori, 3=Registra partita, 4=Statistiche, 5=Torneo a eliminazione, 0=Esci]")
+    else:
+        print(f"\n⚠️ Numero di giocatori non valido per il torneo (attualmente {num_players}).")
+        print("Opzioni disponibili:")
+        print("[1=Aggiungi giocatori, 2=Lista giocatori, 3=Registra partita, 4=Statistiche, 0=Esci]")
+
+    action = input("Cosa vuoi fare? ").strip()
+
+    if action == "1":
+        add_new_players(registered_players)
+
+        # 🔄 Aggiorna la lista dei giocatori dopo aggiunta
+        wb = load_workbook(FILE_PATH)
+        ws = wb[SHEET_NAME]
+        registered_players = [
+            row[0] for row in ws.iter_rows(min_row=2, max_col=1, values_only=True) if row[0]
+        ]
+
+    elif action == "2":
+        read_players(registered_players)
+
+    elif action == "3":
+        register_match(registered_players)
+        wb = load_workbook(FILE_PATH)  # Ricarica il file per aggiornamenti
+
+    elif action == "4":
+        update_statistics()
+
+    elif action == "5":
+        if num_players % 2 == 0 and num_players > 0:
+            torneo_eliminazione(registered_players)
+        else:
+            print("❌ Il torneo può iniziare solo con un numero pari di giocatori maggiore di zero.")
+
+    elif action == "0":
+        print("👋 Uscita dal programma.")
+        break
+
+    else:
+        print("❌ Opzione non valida. Riprova.")
+
