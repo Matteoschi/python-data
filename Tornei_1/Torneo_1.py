@@ -273,7 +273,7 @@ def torneo_eliminazione(squadre):
         turno += 1
     vittoriosa = squadre[0]
     print(f"\n🏆 La squadra vincitrice del torneo è: {vittoriosa.upper()}")
-    ws_torneo.append[date,"-","-","-","-",vittoriosa.upper(),"VINCITORE"]
+    ws_torneo.append([date, "-", "-", "-", "-", vittoriosa.upper(), "VINCITORE"])
     wb.save(FILE_PATH)
 
 # === Avvio del programma ===
@@ -362,4 +362,3 @@ while True:
 
     else:
         print("❌ Opzione non valida. Riprova.")
-
