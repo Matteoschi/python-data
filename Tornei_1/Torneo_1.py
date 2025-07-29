@@ -201,44 +201,80 @@ def update_statistics():
     print("\n📁 Statistics sheet updated and saved.")
 
 def torneo_eliminazione(squadre):
+    wb = load_workbook(FILE_PATH)
+
+    # Gestione foglio "torneo"
+    if "torneo" in wb.sheetnames:
+        eliminare = input("Vuoi creare un nuovo torneo? (s/n): ").lower().strip()
+        if eliminare == "s":
+            del wb["torneo"]
+            print("✅ Vecchio torneo eliminato.")
+    if "torneo" not in wb.sheetnames:
+        ws_torneo = wb.create_sheet("torneo")
+        ws_torneo.append(["Data", "Giocatore 1", "Giocatore 2", "Punto 1", "Punto 2", "Risultato", "Vincitore", "Commento"])
+    else:
+        ws_torneo = wb["torneo"]
+
     turno = 1
     while len(squadre) > 1:
-        print(f"\n--- Turno {turno} - {len(squadre)} squadre ---")
+        print(f"\n🎯 --- Turno {turno} - {len(squadre)} giocatori ---")
         random.shuffle(squadre)
         vincitori = []
+
+        squadra_bye = None
+        if len(squadre) % 2 != 0:
+            squadra_bye = squadre.pop()  # Rimuove e salva l'ultimo
+            vincitori.append(squadra_bye)
+            print(f"\n⚠️ {squadra_bye} PASSA AUTOMATICAMENTE IL TURNO")
+            date = datetime.now().strftime("%Y-%m-%d %H:%M")
+            ws_torneo.append([date, squadra_bye, "-", "-", "-", "-", squadra_bye, "Passa automaticamente il turno"])
 
         for i in range(0, len(squadre), 2):
             squadra1 = squadre[i]
             squadra2 = squadre[i + 1]
-            print(f"{squadra1} vs {squadra2}")
+            print(f"\n🏁 {squadra1} vs {squadra2}")
 
+            # Inserimento vincitore
             while True:
-                vincitore = input("Inserisci il vincitore: ").strip().lower()
+                vincitore = input("👉 Inserisci il vincitore: ").strip().lower()
                 if vincitore != squadra1.lower() and vincitore != squadra2.lower():
-                    print("Errore: il vincitore deve essere una delle due squadre.")
+                    print("❌ Errore: il vincitore deve essere uno dei due.")
                 else:
+                    vincitore = vincitore.capitalize()
                     break
-            vincitori.append(vincitore.capitalize())
 
+            # Inserimento risultato
             while True:
-                risultato = input("Inserisci il risultato (es. 2-1): ").strip()
+                risultato = input("📊 Inserisci il risultato (es. 2-1): ").strip()
                 try:
                     g1, g2 = map(int, risultato.split("-"))
                 except ValueError:
-                    print("Formato non valido. Usa il formato es. 2-1")
+                    print("❌ Formato non valido. Usa es. 2-1")
                     continue
 
                 if g1 == g2:
-                    print("È un torneo a eliminazione diretta: non sono possibili i pareggi.")
+                    print("❌ Pareggi non ammessi nel torneo a eliminazione.")
                 else:
                     break
 
-            print(f"Vince {vincitore.capitalize()} con il risultato di {g1}-{g2}")
+            # Commento opzionale
+            vuole_commento = input("💬 Inserisci un commento (oppure digita 'n'): ").strip()
+            commento = "" if vuole_commento.lower() == "n" else vuole_commento
+
+            date = datetime.now().strftime("%Y-%m-%d %H:%M")
+            ws_torneo.append([
+                date, squadra1, squadra2, g1, g2, risultato, vincitore, commento
+            ])
+
+            print(f"✅ Vince {vincitore} con il risultato di {g1}-{g2}")
+            vincitori.append(vincitore)
 
         squadre = vincitori
         turno += 1
-
-    print(f"\n🏆 La squadra vincitrice del torneo è: {squadre[0]}")
+    vittoriosa = squadre[0]
+    print(f"\n🏆 La squadra vincitrice del torneo è: {vittoriosa.upper()}")
+    ws_torneo.append[date,"-","-","-","-",vittoriosa.upper(),"VINCITORE"]
+    wb.save(FILE_PATH)
 
 # === Avvio del programma ===
 if not os.path.exists(FILE_PATH):
