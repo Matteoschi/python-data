@@ -12,7 +12,6 @@ SHEET_NAME = 'Players'
 
 # List to store player names
 player_list = []
-
 def add_players():
     try:
         num_players = int(input("How many players are there? "))
@@ -41,27 +40,28 @@ def read_players(registered_players):
         print(f"{i}: {name}")
 
 def register_match(registered_players):
+    match_players = []
+
     if len(registered_players) < 2:
         print("❌ At least two registered players are required to record a match.")
         return
-
-    match_players = []
     print("✍️ Enter names of 2 players. Press Enter to stop.")
 
-    for i in range(2):
-        player_name = input("Player name: ").lower().strip()
+    while len(match_players) < 2:
+        player_name = input(f"Player name {len(match_players)+1}: ").lower().strip()
+
         if not player_name:
-            if len(match_players) < 2:
-                print("❌ You must enter two players.")
-                continue
-            else:
-                break
+            print("❌ Name cannot be empty.")
+            continue
+
         if player_name not in [p.lower() for p in registered_players]:
             print("❌ Player not found.")
             continue
+
         if player_name in match_players:
             print("⚠️ Player already entered.")
             continue
+
         match_players.append(player_name)
 
     comment = ""
@@ -83,6 +83,7 @@ def register_match(registered_players):
     if "Matches" not in wb.sheetnames:
         ws_matches = wb.create_sheet("Matches")
         ws_matches.append(["Date", "Player 1", "Player 2", "Score 1", "Score 2", "Score", "Comment"])
+        print("✅ creato foglio partite")
     else:
         ws_matches = wb["Matches"]
 
@@ -254,8 +255,18 @@ def torneo_eliminazione(squadre):
 
                 if g1 == g2:
                     print("❌ Pareggi non ammessi nel torneo a eliminazione.")
-                else:
-                    break
+                    continue
+
+                if g1 < 0 or g2 < 0:
+                    print("❌ I punteggi non possono essere negativi. Riprova.")
+                    continue
+
+                if g1 < g2:
+                    print("⚠️ Inserire come primo punteggio quello del vincitore.")
+                    continue
+
+                #Se passa tutti i controlli, esci dal ciclo
+                break
 
             # Commento opzionale
             vuole_commento = input("💬 Inserisci un commento (oppure digita 'n'): ").strip()
@@ -288,7 +299,7 @@ if not os.path.exists(FILE_PATH):
 
     # Inserimento intestazione e giocatori nella prima colonna
     ws.append(["Players"])
-    for player in player_list:
+    for player in player_list: # inserisce i nomi nel file exel estrapolandoli da player list (in cima al codice)
         ws.append([player])
 
     wb.save(FILE_PATH)
@@ -305,9 +316,7 @@ else:
         ws = wb[SHEET_NAME]
         print("✅ File aperto con successo.")
 
-        registered_players = [
-            row[0] for row in ws.iter_rows(min_row=2, max_col=1, values_only=True) if row[0]
-        ]
+        registered_players = [row[0] for row in ws.iter_rows(min_row=2, max_col=1, values_only=True) if row[0]] # giocatori registrati
 
         if not registered_players:
             print("⚠️ Nessun giocatore trovato nel file.")
