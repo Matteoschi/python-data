@@ -1,0 +1,152 @@
+[
+    {
+        "nome": "Paracetamolo",
+        "data": 2025081,
+        "commento": "Antipiretico e analgesico"
+    },
+    {
+        "nome": "Ibuprofene",
+        "data": 20260101,
+        "commento": "Antinfiammatorio"
+    },
+    {
+        "nome": "Amoxicillina",
+        "data": 20251230,
+        "commento": "Antibiotico penicillinico"
+    },
+    {
+        "nome": "Omeprazolo",
+        "data": 20260310,
+        "commento": "Antiacido, inibitore di pompa protonica"
+    },
+    {
+        "nome": "Aspirina",
+        "data": 20260228,
+        "commento": "Antidolorifico e antipiretico"
+    },
+    {
+        "nome": "Tachipirina",
+        "data": 20251212,
+        "commento": "Antipiretico per febbre"
+    },
+    {
+        "nome": "Zirtec",
+        "data": 20260401,
+        "commento": "Antistaminico"
+    },
+    {
+        "nome": "Lansoprazolo",
+        "data": 20260120,
+        "commento": "Protettore gastrico"
+    },
+    {
+        "nome": "Ciprofloxacina",
+        "data": 20251115,
+        "commento": "Antibiotico a largo spettro"
+    },
+    {
+        "nome": "Augmentin",
+        "data": 20260218,
+        "commento": "Antibiotico combinato"
+    },
+    {
+        "nome": "Bentelan",
+        "data": 20251210,
+        "commento": "Cortisone"
+    },
+    {
+        "nome": "Moment",
+        "data": 20260303,
+        "commento": "Antinfiammatorio e analgesico"
+    },
+    {
+        "nome": "Vicks Flu",
+        "data": 20251122,
+        "commento": "Sintomatico per raffreddore"
+    },
+    {
+        "nome": "Gaviscon",
+        "data": 20260115,
+        "commento": "Antiacido digestivo"
+    },
+    {
+        "nome": "Buscopan",
+        "data": 20260209,
+        "commento": "Spasmolitico intestinale"
+    },
+    {
+        "nome": "Enterogermina",
+        "data": 20260415,
+        "commento": "Probiotico intestinale"
+    },
+    {
+        "nome": "Zinco",
+        "data": 20251111,
+        "commento": "Integratore immunitario"
+    },
+    {
+        "nome": "Multicentrum",
+        "data": 20260130,
+        "commento": "Integratore multivitaminico"
+    },
+    {
+        "nome": "Cortisone",
+        "data": 20260325,
+        "commento": "Antinfiammatorio steroideo"
+    },
+    {
+        "nome": "Deltacortene",
+        "data": 20260220,
+        "commento": "Corticosteroide"
+    },
+    {
+        "nome": "Norvasc",
+        "data": 20260305,
+        "commento": "Per pressione alta"
+    },
+    {
+        "nome": "Lasix",
+        "data": 20260202,
+        "commento": "Diuretico"
+    },
+    {
+        "nome": "Eutirox",
+        "data": 20251220,
+        "commento": "Terapia tiroidea"
+    },
+    {
+        "nome": "Xanax",
+        "data": 20260401,
+        "commento": "Ansiolitico"
+    },
+    {
+        "nome": "Tavor",
+        "data": 20251127,
+        "commento": "Ansiolitico sedativo"
+    },
+    {
+        "nome": "Loratadina",
+        "data": 20260101,
+        "commento": "Antistaminico"
+    },
+    {
+        "nome": "Aulin",
+        "data": 20251205,
+        "commento": "Antinfiammatorio"
+    },
+    {
+        "nome": "Voltaren",
+        "data": 20260207,
+        "commento": "Antinfiammatorio topico"
+    },
+    {
+        "nome": "Claritromicina",
+        "data": 20260312,
+        "commento": "Antibiotico macrolide"
+    },
+    {
+        "nome": "Cetirizina",
+        "data": 20251208,
+        "commento": "Antistaminico"
+    }
+]
