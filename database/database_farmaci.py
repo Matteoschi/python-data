@@ -34,7 +34,7 @@ def leggi_persona(dati):
             trovata = True
             break
     if not trovata:
-        print(f"❌ Persona {chi} non trovata")
+        print(f"❌ farmaco {chi} non trovato")
 
 def scrivi_dati():
     nome = input("inserisci il nome : ").strip()
