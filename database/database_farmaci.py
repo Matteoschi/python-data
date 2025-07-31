@@ -1,19 +1,18 @@
 import json
 import os
-from datetime import datetime , timedelta
+from datetime import datetime, timedelta
 
 file_path = r"C:\Users\alessandrini\Documents\coding\data python\database\file.json"
 
-def verifica_esistenza():
+def verifica_file():
     if os.path.exists(file_path):
-        print("il file esiste")
-        esiste_il_file = True
+        print("📁 Il file esiste.")
+        return True
     else:
-        print("file inesistente creo . . .")
-        esiste_il_file = False
-    return esiste_il_file
+        print("❌ File inesistente. Creo il file...")
+        return False
 
-def dati_file():
+def carica_dati():
     if os.path.exists(file_path):
         try:
             with open(file_path, 'r', encoding='utf-8') as file:
@@ -23,113 +22,112 @@ def dati_file():
     else:
         return []
 
-def leggi_persona(dati):
-    chi = input("Chi desideri leggere (nome esatto)? ").lower().strip()
-    trovata = False
-    for persona in dati:
-        if chi == persona["nome"].lower():
-            print(f"\n📄 Dati per {chi}:")
-            for chiave, valore in persona.items():
+def leggi_farmaco(lista_farmaci):
+    nome_farmaco = input("🔍 Inserisci il nome del farmaco da cercare: ").lower().strip()
+    trovato = False
+    for farmaco in lista_farmaci:
+        if nome_farmaco == farmaco["nome"].lower():
+            print(f"\n📄 Dati per '{nome_farmaco}':")
+            for chiave, valore in farmaco.items():
                 print(f"{chiave.capitalize()}: {valore}")
-            trovata = True
+            trovato = True
             break
-    if not trovata:
-        print(f"❌ farmaco {chi} non trovato")
+    if not trovato:
+        print(f"❌ Farmaco '{nome_farmaco}' non trovato.")
 
-def scrivi_dati():
-    nome = input("inserisci il nome : ").strip()
-    data = int(input("inserisci la data di scadenza : "))
-    commento = input("inserisci il commento : ").strip()
+def aggiungi_farmaco():
+    nome = input("📌 Inserisci il nome del farmaco: ").strip()
+    data_scadenza = int(input("📅 Inserisci la data di scadenza (YYYYMMDD): "))
+    commento = input("📝 Inserisci un commento: ").strip()
 
-    nuova_voce = {
+    nuovo_farmaco = {
         "nome": nome,
-        "data": data,
+        "data": data_scadenza,
         "commento": commento
     }
 
-    dati = dati_file()
-    dati.append(nuova_voce)
+    lista_farmaci = carica_dati()
+    lista_farmaci.append(nuovo_farmaco)
 
     with open(file_path, mode='w', encoding="utf-8") as file:
-        json.dump(dati, file, indent=4, ensure_ascii=False)
-        print("✅ Compilazione effettuata con successo")
+        json.dump(lista_farmaci, file, indent=4, ensure_ascii=False)
+        print("✅ Farmaco aggiunto con successo.")
 
-def elimina_dati(dati):
+def elimina_farmaco(lista_farmaci):
+    nome_farmaco = input("🗑️ Inserisci il nome del farmaco da eliminare: ").lower().strip()
+    nuova_lista = [f for f in lista_farmaci if f["nome"].lower() != nome_farmaco]
 
-    chi = input("chi desideri eliminare : ").lower().strip()
-    lista_senza_chi = [persona for persona in dati if persona["nome"].lower() != chi] # Questo filtra la lista rimuovendo tutte le persone con nome uguale a chi
-
-    if len(lista_senza_chi) == len(dati):
-        print("⚠️ Nessuna persona trovata con quel nome.")
+    if len(nuova_lista) == len(lista_farmaci):
+        print("⚠️ Nessun farmaco trovato con quel nome.")
     else:
-        # Sovrascrivi il file con i dati aggiornati
         with open(file_path, 'w', encoding='utf-8') as file:
-            json.dump(lista_senza_chi, file, indent=4, ensure_ascii=False)
-        print(f"✅ Persona '{chi}' eliminata con successo.")
+            json.dump(nuova_lista, file, indent=4, ensure_ascii=False)
+        print(f"✅ Farmaco '{nome_farmaco}' eliminato con successo.")
 
-def modifica(dati):
-    chi = input("Chi desideri modificare (nome esatto)? ").lower().strip()
-    cosa = input("Cosa intendi modificare (nome, data, commento)? ").strip().lower()
+def modifica_farmaco(lista_farmaci):
+    nome_farmaco = input("✏️ Nome del farmaco da modificare: ").lower().strip()
+    attributo = input("🔁 Cosa vuoi modificare? (nome, data, commento): ").strip().lower()
 
-    if cosa == "data":
-        nuova_proprieta = int(input("ricordare di inserire la nuova data YYYYMMDD : "))
-    elif cosa in ["commento", "nome"]:
-        nuova_proprieta = input("Inserisci nuova proprietà: ").strip()
+    if attributo == "data":
+        nuovo_valore = int(input("📅 Inserisci la nuova data (YYYYMMDD): "))
+    elif attributo in ["commento", "nome"]:
+        nuovo_valore = input("🆕 Inserisci il nuovo valore: ").strip()
     else:
-        print("Non è possibile eseguire il comando")
+        print("⚠️ Attributo non valido.")
         return
 
-    trovata = False
-    for persona in dati:
-        if persona["nome"].lower() == chi:
-            persona[cosa] = nuova_proprieta
-            print(f"Attributo '{cosa}' modificato per {chi}")
-            trovata = True
+    modificato = False
+    for farmaco in lista_farmaci:
+        if farmaco["nome"].lower() == nome_farmaco:
+            farmaco[attributo] = nuovo_valore
+            print(f"✅ '{attributo}' aggiornato per il farmaco '{nome_farmaco}'.")
+            modificato = True
             break
-    if not trovata:
-        print("Persona non trovata")
+    if not modificato:
+        print("❌ Farmaco non trovato.")
 
-def controlla_scadenze(dati, giorni_avviso=3):
+def controlla_scadenze(lista_farmaci, giorni_avviso=3):
     oggi = datetime.today().date()
-    trovata_scadenza = False 
+    scadenze_trovate = False 
 
-    for persona in dati:
+    for farmaco in lista_farmaci:
         try:
-            data_scadenza = datetime.strptime(str(persona["data"]), "%Y%m%d").date()
+            data_scadenza = datetime.strptime(str(farmaco["data"]), "%Y%m%d").date()
         except ValueError:
-            print(f"⚠️ Data non valida per {persona.get('nome', 'Sconosciuto')}: {persona['data']}")
+            print(f"⚠️ Data non valida per {farmaco.get('nome', 'Sconosciuto')}: {farmaco['data']}")
             continue
 
         if oggi <= data_scadenza <= oggi + timedelta(days=giorni_avviso):
-            print(f"⚠️ Scadenza in arrivo per {persona['nome']}: {data_scadenza}")
-            trovata_scadenza = True
+            print(f"⚠️ Scadenza in arrivo per '{farmaco['nome']}': {data_scadenza}")
+            scadenze_trovate = True
 
-    if not trovata_scadenza:
+    if not scadenze_trovate:
         print("✅ Nessuna scadenza in arrivo nei prossimi giorni.")
 
 def main():
-    controlla_scadenze(dati_file()) 
+    controlla_scadenze(carica_dati()) 
+
     while True:
-        dati = dati_file() 
-        azione = int(input("\n1 = leggi dati | 2 = scrivi i dati | 3 = elimina dati | 4 = modifica | 5 = controlla scadenze | 6 = esci : "))
-        if azione == 1:
-            leggi_persona(dati)
-        elif azione == 2:
-            scrivi_dati()
-        elif azione == 3:
-            elimina_dati(dati)
-        elif azione == 4:
-            modifica(dati)
-        elif azione == 5:
-            controlla_scadenze(dati)
-        elif azione == 6:
-            print("Uscita dal programma.")
+        lista_farmaci = carica_dati() 
+        try:
+            scelta = int(input("\n1 = Leggi farmaco | 2 = Aggiungi farmaco | 3 = Elimina farmaco | 4 = Modifica farmaco | 6 = Esci"))
+        except ValueError:
+            print("⚠️ Inserisci un numero valido.")
+            continue
+
+        if scelta == 1:
+            leggi_farmaco(lista_farmaci)
+        elif scelta == 2:
+            aggiungi_farmaco()
+        elif scelta == 3:
+            elimina_farmaco(lista_farmaci)
+        elif scelta == 4:
+            modifica_farmaco(lista_farmaci)
+        elif scelta == 6:
+            print("👋 Uscita dal programma.")
             break
         else:
             print("⚠️ Scelta non valida.")
 
 if __name__ == "__main__":
-  main()
-
-
-    
+    main()
