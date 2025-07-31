@@ -1,18 +1,17 @@
 import json
 import os
-from datetime import datetime
+from datetime import datetime , timedelta
 
 file_path = r"C:\Users\alessandrini\Documents\coding\data python\database\file.json"
 
 def verifica_esistenza():
-    if os.path.exist(file_path):
+    if os.path.exists(file_path):
         print("il file esiste")
         esiste_il_file = True
     else:
         print("file inesistente creo . . .")
         esiste_il_file = False
     return esiste_il_file
-
 
 def dati_file():
     if os.path.exists(file_path):
@@ -23,7 +22,6 @@ def dati_file():
             return []
     else:
         return []
-
 
 def leggi_persona(dati):
     chi = input("Chi desideri leggere (nome esatto)? ").lower().strip()
@@ -93,19 +91,27 @@ def modifica(dati):
 
 def controlla_scadenze(dati, giorni_avviso=3):
     oggi = datetime.today().date()
+    trovata_scadenza = False 
+
     for persona in dati:
         try:
             data_scadenza = datetime.strptime(str(persona["data"]), "%Y%m%d").date()
-            if oggi <= data_scadenza <= oggi + giorni_avviso:
-                print(f"⚠️ Scadenza in arrivo per {persona['nome']}: {data_scadenza}")
-        except Exception:
+        except ValueError:
+            print(f"⚠️ Data non valida per {persona.get('nome', 'Sconosciuto')}: {persona['data']}")
             continue
 
+        if oggi <= data_scadenza <= oggi + timedelta(days=giorni_avviso):
+            print(f"⚠️ Scadenza in arrivo per {persona['nome']}: {data_scadenza}")
+            trovata_scadenza = True
+
+    if not trovata_scadenza:
+        print("✅ Nessuna scadenza in arrivo nei prossimi giorni.")
+
 def main():
+    controlla_scadenze(dati_file()) 
     while True:
-        dati=dati_file()
-        controlla_scadenze(dati)
-        azione = int(input("1 = leggi dati | 2 = scivi i dati | 3 = elimina dati | 4=modifica |5 = esci : "))
+        dati = dati_file() 
+        azione = int(input("\n1 = leggi dati | 2 = scrivi i dati | 3 = elimina dati | 4 = modifica | 5 = controlla scadenze | 6 = esci : "))
         if azione == 1:
             leggi_persona(dati)
         elif azione == 2:
@@ -114,9 +120,13 @@ def main():
             elimina_dati(dati)
         elif azione == 4:
             modifica(dati)
-        else:
+        elif azione == 5:
+            controlla_scadenze(dati)
+        elif azione == 6:
+            print("Uscita dal programma.")
             break
-
+        else:
+            print("⚠️ Scelta non valida.")
 
 if __name__ == "__main__":
   main()
